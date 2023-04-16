@@ -92,3 +92,5 @@ MonoBehaviour:
   defaultSprite: {fileID: 21300000, guid: 9768b9d399991e0468fdce7c9405c7bb, type: 3}
   hoveredSprite: {fileID: 21300000, guid: 34f69f6dda2ffd04d94298c679bcdc41, type: 3}
   clickedSprite: {fileID: 21300000, guid: ab3a31658ff26e24eb5e200f830ee7b7, type: 3}
+  elevatorPrefab: {fileID: 4423469583823103472, guid: c69b4fd9fb632ee438de7dbb416a72fe, type: 3}
+  fanPrefab: {fileID: 8523397510590346052, guid: 5a5744afcb951824791b190e39e8b8d4, type: 3}
