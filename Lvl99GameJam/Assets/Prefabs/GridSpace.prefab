@@ -94,3 +94,4 @@ MonoBehaviour:
   clickedSprite: {fileID: 21300000, guid: ab3a31658ff26e24eb5e200f830ee7b7, type: 3}
   elevatorPrefab: {fileID: 4423469583823103472, guid: c69b4fd9fb632ee438de7dbb416a72fe, type: 3}
   fanPrefab: {fileID: 8523397510590346052, guid: 5a5744afcb951824791b190e39e8b8d4, type: 3}
+  dummyObject: {fileID: 4423469583823103472, guid: e028af37600ed8f4c83359e19aaea7f3, type: 3}
