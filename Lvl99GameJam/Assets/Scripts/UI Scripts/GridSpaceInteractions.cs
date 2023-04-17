@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,17 +14,25 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     
     public GameObject elevatorPrefab;
     public GameObject fanPrefab;
+    public GameObject dummyObject;
+
+    private Sprite elevatorSprite;
+    private Sprite fanSprite;
 
     private bool containsPointer;
     private Image image;
     private Dictionary<KeyCode, GameObject> keyCodeToPrefab;
     private GameObject placement;
+    private GameObject dummyPlacement;
     private GameObject placementPrefab;
     private bool shouldDestroyPlacement = true;
 
     // Start is called before the first frame update
     void Start()
     {
+        elevatorSprite = elevatorPrefab.GetComponent<SpriteRenderer>().sprite;
+        fanSprite = fanPrefab.GetComponent<SpriteRenderer>().sprite;
+
         image = GetComponent<Image>();
         image.sprite = defaultSprite;
         keyCodeToPrefab = new Dictionary<KeyCode, GameObject>
@@ -41,6 +50,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             image.sprite = clickedSprite;
         }
         shouldDestroyPlacement = !shouldDestroyPlacement;
+        InstantiatePlacementIfNecessary();
         DestroyPlacementIfNecessary();
     }
 
@@ -59,7 +69,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             image.sprite = hoveredSprite;
         }
         containsPointer = true;
-        InstantiatePlacementIfNecessary();
+        ShowSpritePreviewIfNecessary();
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -69,7 +79,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             image.sprite = defaultSprite;
         }
         containsPointer = false;
-        DestroyPlacementIfNecessary();
+        DestroyPreview();
     }
 
     private void DestroyPlacementIfNecessary()
@@ -79,6 +89,28 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             Destroy(placement);
             placement = null;
         }
+    }
+
+    private void ShowSpritePreviewIfNecessary()
+    {
+        if (!dummyPlacement)
+        {
+            dummyPlacement = Instantiate(dummyObject, transform.position, Quaternion.identity);
+            if (placementPrefab == elevatorPrefab)
+            {
+                dummyPlacement.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
+            }
+            else
+            {
+                dummyPlacement.GetComponent<SpriteRenderer>().sprite = fanSprite;
+            }
+        }
+    }
+
+    private void DestroyPreview()
+    {
+        Destroy(dummyPlacement);
+        dummyPlacement = null;
     }
 
     private void InstantiatePlacementIfNecessary()
@@ -96,11 +128,6 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             if (Input.GetKeyDown(keyCode) && placementPrefab != prefab)
             {
                 placementPrefab = prefab;
-                if (containsPointer)
-                {
-                    DestroyPlacementIfNecessary();
-                    InstantiatePlacementIfNecessary();
-                }
             }
         }
     }
