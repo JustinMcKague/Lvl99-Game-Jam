@@ -23,7 +23,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     private Image image;
     private Dictionary<KeyCode, GameObject> keyCodeToPrefab;
     private GameObject placement;
-    private GameObject dummyPlacement;
+    private GameObject placementPreview;
     private GameObject placementPrefab;
     private bool shouldDestroyPlacement = true;
 
@@ -93,24 +93,27 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
 
     private void ShowSpritePreviewIfNecessary()
     {
-        if (!dummyPlacement)
+        if (!placementPreview && !placement)
         {
-            dummyPlacement = Instantiate(dummyObject, transform.position, Quaternion.identity);
+            placementPreview = Instantiate(dummyObject, transform.position, Quaternion.identity);
             if (placementPrefab == elevatorPrefab)
             {
-                dummyPlacement.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
+                placementPreview.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
             }
             else
             {
-                dummyPlacement.GetComponent<SpriteRenderer>().sprite = fanSprite;
+                placementPreview.GetComponent<SpriteRenderer>().sprite = fanSprite;
             }
         }
     }
 
     private void DestroyPreview()
     {
-        Destroy(dummyPlacement);
-        dummyPlacement = null;
+        if (placementPreview)
+        {
+            Destroy(placementPreview);
+            placementPreview = null;
+        }
     }
 
     private void InstantiatePlacementIfNecessary()
@@ -128,6 +131,11 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             if (Input.GetKeyDown(keyCode) && placementPrefab != prefab)
             {
                 placementPrefab = prefab;
+                if (containsPointer)
+                {
+                    DestroyPlacementIfNecessary();
+                    InstantiatePlacementIfNecessary();
+                }
             }
         }
     }
