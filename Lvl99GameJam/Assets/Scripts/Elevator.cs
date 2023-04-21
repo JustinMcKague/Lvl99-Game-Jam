@@ -12,7 +12,7 @@ public class Elevator : MonoBehaviour
     [Tooltip("When true, the elevator goes from neutral to lifted. If false, the elevator starts at a lifted position and lowers on activation.")]
     public bool startNeutral = true;
 
-    //[HideInInspector]
+    [HideInInspector]
     public bool finishedAction = false;
 
     private BoxCollider2D trigger;

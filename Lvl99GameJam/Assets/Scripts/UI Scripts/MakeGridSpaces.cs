@@ -5,13 +5,8 @@ using UnityEngine;
 
 public class MakeGridSpaces : MonoBehaviour
 {
-    //[Tooltip("Ranges from 1, a \"small\" (5x10) grid to 3, a \"large\" grid (5x12)")]
-    //[Range(1f, 3f)]
-    //public int gridSize;
-
     public GameObject gridPrefab;
 
-    private int previousGridSize;
 
     private Transform parent;
 
@@ -24,18 +19,9 @@ public class MakeGridSpaces : MonoBehaviour
     private void OnEnable()
     {
         parent = GetComponent<Transform>();
-        previousGridSize = 1;
         CreateGrid();
     }
 
-    // Update is called once per frame
-    //void Update()
-    //{
-    //    if (parent.childCount > 0)
-    //    {
-    //        StartCoroutine(Clear());
-    //    }
-    //}
 
     private IEnumerator Clear()
     {
@@ -61,6 +47,5 @@ public class MakeGridSpaces : MonoBehaviour
         {
             GameObject gridSpace = Instantiate(gridPrefab, parent);
         }
-        //previousGridSize = gridSize;
     }
 }
