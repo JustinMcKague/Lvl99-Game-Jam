@@ -12,7 +12,8 @@ public class Elevator : MonoBehaviour
     [Tooltip("When true, the elevator goes from neutral to lifted. If false, the elevator starts at a lifted position and lowers on activation.")]
     public bool startNeutral = true;
 
-    private bool finishedAction = false;
+    //[HideInInspector]
+    public bool finishedAction = false;
 
     private BoxCollider2D trigger;
 
@@ -34,14 +35,17 @@ public class Elevator : MonoBehaviour
 
     private IEnumerator LiftElevator()
     {
-        while (elapsedTime < timeToElevate)
+        GameManager.Instance.actionInProgress = true;
+        while (elapsedTime < timeToElevate / 60)
         {
             transform.position = Vector2.Lerp(transform.position, startPos + distanceToTravelY, (elapsedTime / timeToElevate));
             elapsedTime += Time.deltaTime;
 
             yield return null;
         }
-        yield return null;
         transform.position = startPos + distanceToTravelY;
+        finishedAction = true;
+        GameManager.Instance.actionInProgress = false;
+        yield return null;
     }
 }

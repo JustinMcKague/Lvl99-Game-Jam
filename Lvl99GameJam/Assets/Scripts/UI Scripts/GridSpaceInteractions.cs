@@ -27,6 +27,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     private GameObject placementPrefab;
     private bool shouldDestroyPlacement = true;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,6 +46,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        //if (!GameManager.Instance.actionInProgress) {
         if (image.sprite && image.sprite != clickedSprite)
         {
             image.sprite = clickedSprite;
@@ -52,6 +54,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
         shouldDestroyPlacement = !shouldDestroyPlacement;
         InstantiatePlacementIfNecessary();
         DestroyPlacementIfNecessary();
+        //}
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -120,7 +123,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     {
         if (!placement)
         {
-            placement = Instantiate(placementPrefab, transform.position, Quaternion.identity);
+            placement = Instantiate(placementPrefab, transform.position, Quaternion.identity, GameManager.Instance.rotatorParent);
         }
     }
 
@@ -133,8 +136,8 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
                 placementPrefab = prefab;
                 if (containsPointer)
                 {
-                    DestroyPlacementIfNecessary();
-                    InstantiatePlacementIfNecessary();
+                    DestroyPreview();
+                    ShowSpritePreviewIfNecessary();
                 }
             }
         }
