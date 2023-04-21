@@ -23,9 +23,10 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     private Image image;
     private Dictionary<KeyCode, GameObject> keyCodeToPrefab;
     private GameObject placement;
-    private GameObject dummyPlacement;
+    private GameObject placementPreview;
     private GameObject placementPrefab;
     private bool shouldDestroyPlacement = true;
+
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +46,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        //if (!GameManager.Instance.actionInProgress) {
         if (image.sprite && image.sprite != clickedSprite)
         {
             image.sprite = clickedSprite;
@@ -52,6 +54,7 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
         shouldDestroyPlacement = !shouldDestroyPlacement;
         InstantiatePlacementIfNecessary();
         DestroyPlacementIfNecessary();
+        //}
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -93,31 +96,34 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
 
     private void ShowSpritePreviewIfNecessary()
     {
-        if (!dummyPlacement)
+        if (!placementPreview && !placement)
         {
-            dummyPlacement = Instantiate(dummyObject, transform.position, Quaternion.identity);
+            placementPreview = Instantiate(dummyObject, transform.position, Quaternion.identity);
             if (placementPrefab == elevatorPrefab)
             {
-                dummyPlacement.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
+                placementPreview.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
             }
             else
             {
-                dummyPlacement.GetComponent<SpriteRenderer>().sprite = fanSprite;
+                placementPreview.GetComponent<SpriteRenderer>().sprite = fanSprite;
             }
         }
     }
 
     private void DestroyPreview()
     {
-        Destroy(dummyPlacement);
-        dummyPlacement = null;
+        if (placementPreview)
+        {
+            Destroy(placementPreview);
+            placementPreview = null;
+        }
     }
 
     private void InstantiatePlacementIfNecessary()
     {
         if (!placement)
         {
-            placement = Instantiate(placementPrefab, transform.position, Quaternion.identity);
+            placement = Instantiate(placementPrefab, transform.position, Quaternion.identity, GameManager.Instance.rotatorParent);
         }
     }
 
@@ -128,6 +134,11 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
             if (Input.GetKeyDown(keyCode) && placementPrefab != prefab)
             {
                 placementPrefab = prefab;
+                if (containsPointer)
+                {
+                    DestroyPreview();
+                    ShowSpritePreviewIfNecessary();
+                }
             }
         }
     }
