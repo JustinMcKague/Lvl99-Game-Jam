@@ -19,18 +19,20 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
     private Sprite elevatorSprite;
     private Sprite fanSprite;
 
+    private int canvasSortingOrder;
     private bool containsPointer;
     private Image image;
     private Dictionary<KeyCode, GameObject> keyCodeToPrefab;
     private GameObject placement;
     private GameObject placementPreview;
     private GameObject placementPrefab;
+    private Quaternion rotation = Quaternion.identity;
     private bool shouldDestroyPlacement = true;
-
 
     // Start is called before the first frame update
     void Start()
     {
+        canvasSortingOrder = GameObject.Find("Canvas").GetComponent<Canvas>().sortingOrder;
         elevatorSprite = elevatorPrefab.GetComponent<SpriteRenderer>().sprite;
         fanSprite = fanPrefab.GetComponent<SpriteRenderer>().sprite;
 
@@ -99,13 +101,18 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
         if (!placementPreview && !placement)
         {
             placementPreview = Instantiate(dummyObject, transform.position, Quaternion.identity);
+            var placementPreviewSpriteRenderer = placementPreview.GetComponent<SpriteRenderer>();
+            placementPreviewSpriteRenderer.sortingOrder = canvasSortingOrder + 1;
             if (placementPrefab == elevatorPrefab)
             {
-                placementPreview.GetComponent<SpriteRenderer>().sprite = elevatorSprite;
+                placementPreview.transform.localScale = elevatorPrefab.transform.localScale;
+                placementPreviewSpriteRenderer.sprite = elevatorSprite;
             }
             else
             {
-                placementPreview.GetComponent<SpriteRenderer>().sprite = fanSprite;
+                placementPreview.transform.localScale = fanPrefab.transform.localScale;
+                placementPreview.transform.rotation = rotation;
+                placementPreviewSpriteRenderer.sprite = fanSprite;
             }
         }
     }
@@ -124,22 +131,33 @@ public class GridSpaceInteractions : MonoBehaviour, IPointerDownHandler, IPointe
         if (!placement)
         {
             placement = Instantiate(placementPrefab, transform.position, Quaternion.identity, GameManager.Instance.rotatorParent);
+            if (placementPrefab != elevatorPrefab)
+            {
+                placement.transform.rotation = rotation;
+            }
         }
     }
 
     private void Update()
     {
+        var recreatePreview = false;
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            recreatePreview = true;
+            rotation *= Quaternion.Euler(0, 0, -45);
+        }
         foreach (var (keyCode, prefab) in keyCodeToPrefab)
         {
             if (Input.GetKeyDown(keyCode) && placementPrefab != prefab)
             {
                 placementPrefab = prefab;
-                if (containsPointer)
-                {
-                    DestroyPreview();
-                    ShowSpritePreviewIfNecessary();
-                }
+                recreatePreview = true;
             }
+        }
+        if (containsPointer && recreatePreview)
+        {
+            DestroyPreview();
+            ShowSpritePreviewIfNecessary();
         }
     }
 }
